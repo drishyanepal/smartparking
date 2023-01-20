@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context=".UserProfileActivity">
+
+    <ImageView
+        android:id="@+id/userPhoto"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        app:srcCompat="@drawable/user" />
+
+    <EditText
+        android:id="@+id/firstName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/line_grey"
+        android:drawableLeft="@drawable/ic_person"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/lato"
+        android:hint="First Name"
+        android:inputType="textPersonName"
+        android:minHeight="60dp"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/lastName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/line_grey"
+        android:drawableLeft="@drawable/ic_person"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/lato"
+        android:inputType="textPersonName"
+        android:minHeight="60dp"
+        android:hint="Last Name"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/dob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/line_grey"
+        android:drawableLeft="@drawable/ic_calender"
+        android:drawablePadding="10dp"
+        android:focusable="false"
+        android:fontFamily="@font/lato"
+        android:hint="Date of Birth"
+        android:minHeight="60dp"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/line_grey"
+        android:drawableLeft="@drawable/ic_email"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/lato"
+        android:hint="Email"
+        android:inputType="textPersonName"
+        android:minHeight="60dp"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/vehicleNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/line_grey"
+        android:drawableLeft="@drawable/ic_vehicle"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/lato"
+        android:inputType="textWebEmailAddress"
+        android:minHeight="60dp"
+        android:hint="Enter vehicle number"
+        android:textSize="18sp" />
+    <EditText
+        android:id="@+id/phoneNumberProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/line_grey"
+        android:drawableLeft="@drawable/ic_phone"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/lato"
+        android:focusable="false"
+        android:hint="phone number"
+        android:minHeight="60dp"
+        android:textSize="18sp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/lato"
+            android:padding="6dp"
+            android:text="Save"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:backgroundTint="@null" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SmartParkingOne</string>
+    <string name="open_drawer">OpenNavigationDrawer</string>
+    <string name="close_drawer">CloseNavigationDrawer</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

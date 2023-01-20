@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/</item>
+        <item>@font/actor</item>
+        <item>@font/amethysta</item>
+        <item>@font/arbutus_slab</item>
+        <item>@font/baloo_bhai_2</item>
+        <item>@font/basic</item>
+        <item>@font/cantora_one</item>
+        <item>@font/carme</item>
+        <item>@font/crimson_text_semibold</item>
+        <item>@font/lato_thin</item>
+    </array>
+</resources>
