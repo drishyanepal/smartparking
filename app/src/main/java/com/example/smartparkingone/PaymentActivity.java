@@ -65,17 +65,17 @@ public class PaymentActivity extends AppCompatActivity {
                 String balance = binding.balance.getText().toString();
                 float balanceInt = Float.parseFloat(balance);
                 balanceInt = balanceInt - Float.parseFloat(cost);
-                database.getReference().child("Users").child(auth.getUid()).child("balance").setValue(balanceInt);
+                database.getReference().child("Others").child("Balance").child(auth.getUid()).setValue(balanceInt);
 
                 SharedPreferences sharedPreferencesUsername = getSharedPreferences("balance", MODE_PRIVATE);
                 SharedPreferences.Editor editorTwo = sharedPreferencesUsername.edit();
                 editorTwo.putFloat("balance", balanceInt);
                 editorTwo.apply();
 
-                database.getReference().child("Slots").child(slotId).setValue("2");
+                database.getReference().child("Slots").child(slotId).setValue(2);
                 Toast.makeText(PaymentActivity.this, "Payment Successful", Toast.LENGTH_SHORT).show();
 
-                database.getReference().child("SlotBooked").child(slotId).setValue(getSlotIdInNumber());
+                database.getReference().child("BookDetails").child("SlotsBooked").child(slotId).setValue(getSlotIdInNumber());
 
                 database.getReference().child("SlotsByVehicle").child(String.valueOf(getSlotIdInNumber())).setValue(vehicleNumber);
                 finish();
@@ -124,7 +124,7 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void getBalanceFromFirebase() {
-        database.getReference().child("Users").child(auth.getUid()).child("balance").addValueEventListener(new ValueEventListener() {
+        database.getReference().child("Others").child("Balance").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 float getBalance = snapshot.getValue(float.class);

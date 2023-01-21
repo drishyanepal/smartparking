@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +26,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ParkingSlotsActivity extends AppCompatActivity implements View.OnClickListener {
+public class ParkingSlotsActivity extends AppCompatActivity {
     ActivityParkingSlotsBinding binding;
     String startHour, startMin, startSec, endHour, endMin, endSec, timeOfDayStart, timeOfDayEnd;
     String slotId;
@@ -33,7 +35,6 @@ public class ParkingSlotsActivity extends AppCompatActivity implements View.OnCl
     FirebaseDatabase database;
     int[] clickedStatus = new int[1];
     boolean sevenBooked = false, twentySevenBooked = false;
-    RelativeLayout Seven, TwentySeven, ThirtyFour, Forty, FortyThree, FortyFour, FiftyThree, FiftyFive, FiftySeven, FiftyNine, SixtySix, SixtySeven;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,45 +52,81 @@ public class ParkingSlotsActivity extends AppCompatActivity implements View.OnCl
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        findAllViewsById();
-
-        loadSlotData();
+        loadBookedSlotsData();
         //-----------on clicks-----------------------------------------------------------------
-//        slotsClickHandle();
+        slotsClickHandle();
+        binding.minus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (parkDuration > 1) {
+                    parkDuration--;
+                    binding.parkDuration.setText(String.valueOf(parkDuration));
+                    String cost = String.valueOf(parkDuration * 50);
+                    binding.cost.setText(cost);
+                    endHour = String.valueOf(Integer.parseInt(endHour) - 1);
+                    int hrs = Integer.parseInt(endHour);
+                    if (hrs == 0) {
+                        endHour = "12";
+                    }
+                    if (hrs == 11) {
+                        if (timeOfDayEnd.equals("pm")) {
+                            timeOfDayEnd = "am";
+                        } else {
+                            timeOfDayEnd = "pm";
+                        }
+                    }
+                    binding.timeTo.setText(returnEndTime());
+                }
+            }
+        });
 
+        binding.plus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parkDuration++;
+                binding.parkDuration.setText(String.valueOf(parkDuration));
+                String cost = String.valueOf(parkDuration * 50);
+                binding.cost.setText(cost);
+                endHour = String.valueOf(Integer.parseInt(endHour) + 1);
+                int hrs = Integer.parseInt(endHour);
+                if (hrs == 12) {
+                    if (timeOfDayEnd.equals("pm")) {
+                        timeOfDayEnd = "am";
+                    } else {
+                        timeOfDayEnd = "pm";
+                    }
+                }
+                if (hrs == 13) {
+                    endHour = "1";
+                }
+
+                binding.timeTo.setText(returnEndTime());
+            }
+        });
+
+//        binding.hiddenLayer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                hidePopUP();
+//            }
+//        });
+
+        binding.proceedButtonPopUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ParkingSlotsActivity.this, EsewaActivity.class);
+                slotId = "slot" + slotId;
+                intent.putExtra("slotId", slotId);
+                intent.putExtra("cost", binding.cost.getText().toString());
+                startActivity(intent);
+                finish();
+            }
+        });
 
     }
 
-    private void findAllViewsById() {
-        Seven = findViewById(R.id.Seven);
-        Seven.setOnClickListener(this);
-        TwentySeven = findViewById(R.id.TwentySeven);
-        TwentySeven.setOnClickListener(this);
-        ThirtyFour = findViewById(R.id.ThirtyFour);
-        ThirtyFour.setOnClickListener(this);
-        Forty = findViewById(R.id.Forty);
-        Forty.setOnClickListener(this);
-        FortyThree = findViewById(R.id.FortyThree);
-        FortyThree.setOnClickListener(this);
-        FortyFour = findViewById(R.id.FortyFour);
-        FortyFour.setOnClickListener(this);
-        FiftyThree = findViewById(R.id.FiftyThree);
-        FiftyThree.setOnClickListener(this);
-        FiftyFive = findViewById(R.id.FiftyFive);
-        FiftyFive.setOnClickListener(this);
-        FiftySeven = findViewById(R.id.FiftySeven);
-        FiftySeven.setOnClickListener(this);
-        FiftyNine = findViewById(R.id.FiftyNine);
-        FiftyNine.setOnClickListener(this);
-        SixtySix = findViewById(R.id.SixtySix);
-        SixtySix.setOnClickListener(this);
-        SixtySeven = findViewById(R.id.SixtySeven);
-        SixtySeven.setOnClickListener(this);
-    }
-
-
-    private void loadSlotData() {
-        DatabaseReference reference = database.getReference().child("SlotBooked");
+    private void loadBookedSlotsData() {
+        DatabaseReference reference = database.getReference().child("BookDetails").child("SlotsBooked");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -272,9 +309,8 @@ public class ParkingSlotsActivity extends AppCompatActivity implements View.OnCl
                             Toast.makeText(ParkingSlotsActivity.this, "Please wait a moment for this slot ", Toast.LENGTH_SHORT).show();
                             clickedStatus[0] = 50;
                             return;
-                        }
-                        if (clickedStatus[0] == 0) {
-                            setSlotClickedStatus();
+                        } else {
+                            setSlotClickedStatus(slotId);
                             clickedStatus[0] = 50;
                             if (!sevenBooked) {
                                 showPopUpWith();
@@ -282,14 +318,113 @@ public class ParkingSlotsActivity extends AppCompatActivity implements View.OnCl
                             }
                         }
                     }
-                }, 2000);
+                }, 1000);
+            }
+        });
+
+        binding.TwentySeven.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("27");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.ThirtyFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("34");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.Forty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("40");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.FortyThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("43");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.FortyFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("44");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.FiftyThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("53");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.FiftyFive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("55");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.FiftySeven.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("57");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.FiftyNine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("59");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.SixtySix.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("66");
+                slotId = getResources().getResourceEntryName(v.getId());
+            }
+        });
+
+        binding.SixtySeven.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWith();
+                binding.slotNumber.setText("67");
+                slotId = getResources().getResourceEntryName(v.getId());
             }
         });
 
 
     }
 
-    private void setSlotClickedStatus() {
+    private void setSlotClickedStatus(String slotId) {
         DatabaseReference reference = database.getReference().child("SlotClicked").child(slotId);
         reference.setValue(1);
 
@@ -299,7 +434,7 @@ public class ParkingSlotsActivity extends AppCompatActivity implements View.OnCl
             public void run() {
                 reference.setValue(0);
             }
-        }, 1000 * 60);
+        }, 1000 * 10);
     }
 
     private void getSlotClickedStatus(String slotId) {
@@ -322,102 +457,20 @@ public class ParkingSlotsActivity extends AppCompatActivity implements View.OnCl
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.Seven:
-                Toast.makeText(this, "Shhh..", Toast.LENGTH_SHORT).show();
-            case R.id.TwentySeven:
-                showPopUpWith();
-                binding.slotNumber.setText("27");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.ThirtyFour:
-                showPopUpWith();
-                binding.slotNumber.setText("34");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.Forty:
-                showPopUpWith();
-                binding.slotNumber.setText("40");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.FortyThree:
-                showPopUpWith();
-                binding.slotNumber.setText("43");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.FortyFour:
-                showPopUpWith();
-                binding.slotNumber.setText("44");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.FiftyThree:
-                showPopUpWith();
-                binding.slotNumber.setText("53");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.FiftyFive:
-                showPopUpWith();
-                binding.slotNumber.setText("55");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.FiftySeven:
-                showPopUpWith();
-                binding.slotNumber.setText("57");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.FiftyNine:
-                showPopUpWith();
-                binding.slotNumber.setText("59");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.SixtySix:
-                showPopUpWith();
-                binding.slotNumber.setText("66");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.SixtySeven:
-                showPopUpWith();
-                binding.slotNumber.setText("67");
-                slotId = getResources().getResourceEntryName(v.getId());
-            case R.id.plus:
-                parkDuration++;
-                binding.parkDuration.setText(String.valueOf(parkDuration));
-                String cost = String.valueOf(parkDuration * 50);
-                binding.cost.setText(cost);
-                endHour = String.valueOf(Integer.parseInt(endHour) + 1);
-                int hrs = Integer.parseInt(endHour);
-                if (hrs == 12) {
-                    if (timeOfDayEnd.equals("pm")) {
-                        timeOfDayEnd = "am";
-                    } else {
-                        timeOfDayEnd = "pm";
-                    }
-                }
-                if (hrs == 13) {
-                    endHour = "1";
-                }
-
-                binding.timeTo.setText(returnEndTime());
-            case R.id.minus:
-                if (parkDuration > 1) {
-                    parkDuration--;
-                    binding.parkDuration.setText(String.valueOf(parkDuration));
-                    String cost1 = String.valueOf(parkDuration * 50);
-                    binding.cost.setText(cost1);
-                    endHour = String.valueOf(Integer.parseInt(endHour) - 1);
-                    int hrs1 = Integer.parseInt(endHour);
-                    if (hrs1 == 0) {
-                        endHour = "12";
-                    }
-                    if (hrs1 == 11) {
-                        if (timeOfDayEnd.equals("pm")) {
-                            timeOfDayEnd = "am";
-                        } else {
-                            timeOfDayEnd = "pm";
-                        }
-                    }
-                    binding.timeTo.setText(returnEndTime());
-                }
-            case R.id.hiddenLayer:
-                hidePopUP();
-            case R.id.proceedButtonPopUp:
-                Intent intent = new Intent(ParkingSlotsActivity.this, EsewaActivity.class);
-                slotId = "slot" + slotId;
-                intent.putExtra("slotId", slotId);
-                intent.putExtra("cost", binding.cost.getText().toString());
-                startActivity(intent);
-                finish();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.refresh_option) {
+            this.recreate();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
+
+    }
+
+    @Override
+    public boolean onCreatePanelMenu(int featureId, @NonNull Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.refresh, menu);
+        return true;
     }
 }
