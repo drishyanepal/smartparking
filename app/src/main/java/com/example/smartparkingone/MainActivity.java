@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                                 return;
                             }
                             String token = task.getResult();
-                            database.getReference().child("Users").child(auth.getUid()).child("Profile").child("deviceToken").setValue(token);
+                            database.getReference().child("Users").child(auth.getUid()).child("deviceToken").setValue(token);
                             database.getReference().child("VehicleTokenMap").child(vehicleNumber).setValue(token);
                             Log.w("TOKEN", token);
                         }

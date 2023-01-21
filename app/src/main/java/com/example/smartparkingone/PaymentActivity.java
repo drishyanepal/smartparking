@@ -65,7 +65,7 @@ public class PaymentActivity extends AppCompatActivity {
                 String balance = binding.balance.getText().toString();
                 float balanceInt = Float.parseFloat(balance);
                 balanceInt = balanceInt - Float.parseFloat(cost);
-                database.getReference().child("Users").child(auth.getUid()).child("Balance").setValue(balanceInt);
+                database.getReference().child("Users").child(auth.getUid()).child("balance").setValue(balanceInt);
 
                 SharedPreferences sharedPreferencesUsername = getSharedPreferences("balance", MODE_PRIVATE);
                 SharedPreferences.Editor editorTwo = sharedPreferencesUsername.edit();
@@ -124,7 +124,7 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void getBalanceFromFirebase() {
-        database.getReference().child("Users").child(auth.getUid()).child("Balance").addValueEventListener(new ValueEventListener() {
+        database.getReference().child("Users").child(auth.getUid()).child("balance").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 float getBalance = snapshot.getValue(float.class);

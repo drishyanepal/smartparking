@@ -68,7 +68,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     Toast.makeText(UserProfileActivity.this, "Invalid field entry!", Toast.LENGTH_SHORT).show();
                 } else {
                     UserModel model = new UserModel(firstName, lastName, phoneNumber, vehicleNumber, email, dob);
-                    DatabaseReference reference = database.getReference().child("Users").child(auth.getUid()).child("Profile");
+                    DatabaseReference reference = database.getReference().child("Users").child(auth.getUid());
                     reference.setValue(model);
 
                     setSharedPreferences();
@@ -86,7 +86,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     //--------------------------------------------------------------------------------------------------------------------------------
     private void loadProfile() {
-        DatabaseReference reference = database.getReference().child("Users").child(auth.getUid()).child("Profile");
+        DatabaseReference reference = database.getReference().child("Users").child(auth.getUid());
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

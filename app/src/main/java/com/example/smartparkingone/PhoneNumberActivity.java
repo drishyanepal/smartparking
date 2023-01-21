@@ -236,7 +236,7 @@ public class PhoneNumberActivity extends AppCompatActivity {
             model.setVehicleNumber(vehicleNumber);
             model.setPhoneNumber(phoneNumber);
 
-            DatabaseReference reference = database.getReference().child("Users").child(auth.getUid()).child("Profile");
+            DatabaseReference reference = database.getReference().child("Users").child(auth.getUid());
             reference.setValue(model);
 
             setSharedPreferences();
