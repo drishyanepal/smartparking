@@ -30,7 +30,7 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 database = firebase.database()
 
-slots = database.child("SlotBooked").get()
+slots = database.child("BookDetails").child("SlotsBooked").get()
 
 try:
     for slot in slots.each():
@@ -44,7 +44,7 @@ except:
 def updateBookedSlots():
     global bookedSlot
     bookedSlot = []
-    items = database.child("SlotBooked").get()
+    items = database.child("BookDetails").child("SlotsBooked").get()
     try:
         for item in items.each():
             status = item.val()
@@ -62,7 +62,7 @@ def checkParkingSpace(imgPro, img):
     id = 1
     vacant = 10
 
-    if slotCount % 500 == 0:
+    if slotCount % 200 == 0:
         updateBookedSlots()
 
     for pos in posList:
@@ -72,6 +72,7 @@ def checkParkingSpace(imgPro, img):
         imgCrop = imgPro[y:y + height, x:x + width]
         # cv2.imshow(str(x * y), imgCrop)
         count = cv2.countNonZero(imgCrop)
+        cvzone.putTextRect(img, "NCE Parking", (70, 70), scale=2, thickness=2, offset=0)
         cvzone.putTextRect(img, str(id), (x, y + height - 10), scale=1, thickness=2, offset=0)
 
         if count < 800:
@@ -132,7 +133,7 @@ def checkParkingSpace(imgPro, img):
                 elif slotNumber == 51:  # slot2
                     database.child("Slots").child("slotFiftyTwo").set(1)
                     vacant -= 1
-                    database.child("VacantCount").child("NceVacant").set(str(vacant))
+                    database.child("Slots").child("NceVacant").set(str(vacant))
                     print(vacant)
 
         cv2.rectangle(img, pos, (pos[0] + width, pos[1] + height), color, thickness)
@@ -153,7 +154,6 @@ if __name__ == "__main__":
         imgMedian = cv2.medianBlur(imgThreshold, 5)
         kernel = np.ones((3, 3), np.int8)
         imgDilate = cv2.dilate(imgMedian, kernel, iterations=1)
-        cvzone.putTextRect(img, "NCE Parking", (70, 70), scale=2, thickness=2, offset=0)
         checkParkingSpace(imgDilate, img)
 
         cv2.imshow("Ima", img)
