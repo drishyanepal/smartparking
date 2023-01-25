@@ -160,4 +160,4 @@ def getSlotIdInNumber(slotId):
         return 67
 
 
-checkVehicleNumber("BAA2010")
+# checkVehicleNumber("BAA2010")
