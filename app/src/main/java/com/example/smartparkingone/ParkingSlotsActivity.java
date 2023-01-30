@@ -34,6 +34,7 @@ public class ParkingSlotsActivity extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseDatabase database;
     int[] clickedStatus = new int[1];
+    String entryTime, exitTime, durationDB = "1";
     boolean sevenBooked = false, twentySevenBooked = false;
 
     @Override
@@ -61,6 +62,7 @@ public class ParkingSlotsActivity extends AppCompatActivity {
                 if (parkDuration > 1) {
                     parkDuration--;
                     binding.parkDuration.setText(String.valueOf(parkDuration));
+                    durationDB = String.valueOf(parkDuration);
                     String cost = String.valueOf(parkDuration * 50);
                     binding.cost.setText(cost);
                     endHour = String.valueOf(Integer.parseInt(endHour) - 1);
@@ -85,6 +87,7 @@ public class ParkingSlotsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 parkDuration++;
                 binding.parkDuration.setText(String.valueOf(parkDuration));
+                durationDB = String.valueOf(parkDuration);
                 String cost = String.valueOf(parkDuration * 50);
                 binding.cost.setText(cost);
                 endHour = String.valueOf(Integer.parseInt(endHour) + 1);
@@ -116,8 +119,11 @@ public class ParkingSlotsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(ParkingSlotsActivity.this, EsewaActivity.class);
                 slotId = "slot" + slotId;
+                intent.putExtra("entryTime", entryTime);
                 intent.putExtra("slotId", slotId);
                 intent.putExtra("cost", binding.cost.getText().toString());
+                intent.putExtra("duration", durationDB);
+                intent.putExtra("exitTime", exitTime);
                 startActivity(intent);
                 finish();
             }
@@ -281,6 +287,7 @@ public class ParkingSlotsActivity extends AppCompatActivity {
         startSec = splitSecond[0];
         timeOfDayStart = splitSecond[1].trim();
         binding.timeFrom.setText(formattedTime);
+        entryTime = formattedTime;
 
         endHour = String.valueOf(Integer.parseInt(startHour) + 1);
         endMin = startMin;
@@ -292,6 +299,7 @@ public class ParkingSlotsActivity extends AppCompatActivity {
 
     private String returnEndTime() {
         String endTime = endHour + ":" + endMin + ":" + endSec + " " + timeOfDayEnd;
+        exitTime = endTime;
         return endTime;
     }
 
@@ -438,22 +446,24 @@ public class ParkingSlotsActivity extends AppCompatActivity {
     }
 
     private void getSlotClickedStatus(String slotId) {
-        try {
-            DatabaseReference reference = database.getReference().child("SlotClicked").child(slotId);
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+        DatabaseReference reference = database.getReference().child("SlotClicked").child(slotId);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
                     clickedStatus[0] = snapshot.getValue(Integer.class);
+                } catch (Exception e) {
+                    Toast.makeText(ParkingSlotsActivity.this, "try", Toast.LENGTH_SHORT).show();
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-        } catch (Exception e) {
+            }
+        });
 
-        }
     }
 
     @Override

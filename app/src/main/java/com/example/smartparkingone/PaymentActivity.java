@@ -3,12 +3,14 @@ package com.example.smartparkingone;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.smartparkingone.Models.DurationModel;
 import com.example.smartparkingone.databinding.ActivityPaymentBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -18,8 +20,9 @@ import com.google.firebase.database.ValueEventListener;
 
 public class PaymentActivity extends AppCompatActivity {
     ActivityPaymentBinding binding;
-    String cost, slotId;
+    String cost, slotId, entryTime, duration, exitTime;
     FirebaseAuth auth;
+    String vNumber;
     FirebaseDatabase database;
 
     @Override
@@ -33,8 +36,11 @@ public class PaymentActivity extends AppCompatActivity {
 
         slotId = getIntent().getStringExtra("slotId");
         cost = getIntent().getStringExtra("cost");
+        entryTime = getIntent().getStringExtra("entryTime");
+        duration = getIntent().getStringExtra("duration");
+        exitTime = getIntent().getStringExtra("exitTime");
 
-//        getBalanceFromFirebase();
+//       getBalanceFromFirebase();
 
         SharedPreferences getPreferencesBalance = getSharedPreferences("balance", MODE_PRIVATE);
         float getBalance = getPreferencesBalance.getFloat("balance", (float) 4840.78);
@@ -47,6 +53,7 @@ public class PaymentActivity extends AppCompatActivity {
         SharedPreferences getPreferencesVehicle = getSharedPreferences("vehicle_number", MODE_PRIVATE);
         String vehicleNumber = getPreferencesVehicle.getString("vehicle_number", "BAA 7283");
         binding.vehicleNumberPayment.setText(vehicleNumber);
+        vNumber = vehicleNumber;
 
         binding.amountPayment.setText(cost);
 
@@ -78,9 +85,18 @@ public class PaymentActivity extends AppCompatActivity {
                 database.getReference().child("BookDetails").child("SlotsBooked").child(slotId).setValue(getSlotIdInNumber());
 
                 database.getReference().child("SlotsByVehicle").child(String.valueOf(getSlotIdInNumber())).setValue(vehicleNumber);
+
+                uploadTimeDetails();
+
                 finish();
             }
         });
+    }
+
+    private void uploadTimeDetails() {
+        DurationModel model = new DurationModel(entryTime,duration,exitTime);
+        database.getReference().child("BookDetails").child("TimeDetails").
+                child(vNumber).setValue(model);
     }
 
     private int getSlotIdInNumber() {
