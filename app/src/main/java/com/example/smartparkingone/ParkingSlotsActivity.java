@@ -124,6 +124,7 @@ public class ParkingSlotsActivity extends AppCompatActivity {
                 intent.putExtra("cost", binding.cost.getText().toString());
                 intent.putExtra("duration", durationDB);
                 intent.putExtra("exitTime", exitTime);
+                intent.putExtra("source","parking_slots_activity");
                 startActivity(intent);
                 finish();
             }

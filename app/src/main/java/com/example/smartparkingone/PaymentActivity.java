@@ -3,7 +3,6 @@ package com.example.smartparkingone;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -23,6 +22,7 @@ public class PaymentActivity extends AppCompatActivity {
     String cost, slotId, entryTime, duration, exitTime;
     FirebaseAuth auth;
     String vNumber;
+    String intentSource;
     FirebaseDatabase database;
 
     @Override
@@ -33,6 +33,8 @@ public class PaymentActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+        intentSource = getIntent().getStringExtra("source");
 
         slotId = getIntent().getStringExtra("slotId");
         cost = getIntent().getStringExtra("cost");
@@ -79,22 +81,29 @@ public class PaymentActivity extends AppCompatActivity {
                 editorTwo.putFloat("balance", balanceInt);
                 editorTwo.apply();
 
-                database.getReference().child("Slots").child(slotId).setValue(2);
+                if (intentSource.equals("bill_fragment")) {
+                    //TODO : clear record for this user
+
+                    Intent intent = new Intent(PaymentActivity.this, PhoneNumberActivity.class);
+                    startActivity(intent);
+                } else {
+                    database.getReference().child("Slots").child(slotId).setValue(2);
+
+                    database.getReference().child("BookDetails").child("SlotsBooked").child(slotId).setValue(getSlotIdInNumber());
+
+                    database.getReference().child("SlotsByVehicle").child(String.valueOf(getSlotIdInNumber())).setValue(vehicleNumber);
+
+                    uploadTimeDetails();
+
+                }
                 Toast.makeText(PaymentActivity.this, "Payment Successful", Toast.LENGTH_SHORT).show();
-
-                database.getReference().child("BookDetails").child("SlotsBooked").child(slotId).setValue(getSlotIdInNumber());
-
-                database.getReference().child("SlotsByVehicle").child(String.valueOf(getSlotIdInNumber())).setValue(vehicleNumber);
-
-                uploadTimeDetails();
-
                 finish();
             }
         });
     }
 
     private void uploadTimeDetails() {
-        DurationModel model = new DurationModel(entryTime,duration,exitTime);
+        DurationModel model = new DurationModel(entryTime, duration, "", "", "");
         database.getReference().child("BookDetails").child("TimeDetails").
                 child(vNumber).setValue(model);
     }

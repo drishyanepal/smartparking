@@ -4,6 +4,11 @@
         android:id="@+id/city"
         android:title="City"
         android:icon="@drawable/ic_city"/>
+
+    <item
+        android:id="@+id/bills"
+        android:title="My Bill"
+        android:icon="@drawable/ic_bills"/>
     <item
         android:id="@+id/history"
         android:title="History"

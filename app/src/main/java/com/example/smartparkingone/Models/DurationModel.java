@@ -1,14 +1,16 @@
 package com.example.smartparkingone.Models;
 
 public class DurationModel {
-    String entryTime, duration, exitTime;
+    String entryTime, bookedDuration, exitTime, parkedDuration, cost;
     public DurationModel() {
     }
 
-    public DurationModel(String entryTime,String duration, String exitTime){
+    public DurationModel(String entryTime, String bookedDuration, String exitTime, String parkedDuration, String cost) {
         this.entryTime = entryTime;
-        this.duration = duration;
+        this.bookedDuration = bookedDuration;
         this.exitTime = exitTime;
+        this.parkedDuration = parkedDuration;
+        this.cost = cost;
     }
 
     public String getEntryTime() {
@@ -19,12 +21,12 @@ public class DurationModel {
         this.entryTime = entryTime;
     }
 
-    public String getDuration() {
-        return duration;
+    public String getBookedDuration() {
+        return bookedDuration;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public void setBookedDuration(String bookedDuration) {
+        this.bookedDuration = bookedDuration;
     }
 
     public String getExitTime() {
@@ -33,5 +35,21 @@ public class DurationModel {
 
     public void setExitTime(String exitTime) {
         this.exitTime = exitTime;
+    }
+
+    public String getParkedDuration() {
+        return parkedDuration;
+    }
+
+    public void setParkedDuration(String parkedDuration) {
+        this.parkedDuration = parkedDuration;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setCost(String cost) {
+        this.cost = cost;
     }
 }

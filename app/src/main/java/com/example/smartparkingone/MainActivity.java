@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.smartparkingone.Models.BillFragment;
 import com.example.smartparkingone.databinding.ActivityMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -94,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
                 switch (id) {
                     case R.id.city:
                         loadFragment(new MapsFragment());
+                        break;
+                    case R.id.bills:
+                        loadFragment(new BillFragment());
                         break;
                     case R.id.history:
                         loadFragment(new HistoryFragment());
