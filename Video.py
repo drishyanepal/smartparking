@@ -62,7 +62,7 @@ def checkParkingSpace(imgPro, img):
     id = 1
     vacant = 10
 
-    if slotCount % 200 == 0:
+    if slotCount % 20 == 0:
         updateBookedSlots()
 
     for pos in posList:
