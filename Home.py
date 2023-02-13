@@ -2,6 +2,7 @@ from tkinter import *
 from Video import *
 from datetime import datetime
 import time
+import Main
 import FCMManager as fcm
 
 emptySlotsRecord = []
@@ -51,8 +52,10 @@ def setFrameThree(frameThree):
 
 
 def scanVehicleEntry():
-    vehicleNumber = "BAA3406"
-    checkVehicleNumberEntry(vehicleNumber)
+    Main.startNPR()
+    vehicleNumber = Main.numberPlateInString
+    print(vehicleNumber)
+    # checkVehicleNumberEntry(vehicleNumber)
 
 
 def scanVehicleExit():
@@ -134,10 +137,10 @@ def checkVehicleNumberExit(myVehicleNumber):
             amount = int(x * 50)
         else:
             amount = 0
-        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("cost").set(amount)
+        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("cost").set(str(amount))
         database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("exitTime").set(current_time)
         database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("parkedDuration").set(
-            total_Duration)
+            str(total_Duration))
 
     else:
         entry_time = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
