@@ -1,4 +1,6 @@
 from tkinter import *
+
+import Video
 from Video import *
 from datetime import datetime
 import time
@@ -14,41 +16,44 @@ except:
 
 
 def ShowSecondScreen(root):
-    frameOne = Frame(root, bg='blue')
-    frameOne.pack(side=LEFT, expand=True, fill=BOTH)
-    setFrameOne(frameOne)
+    frameOne = Frame(root)
 
-    frameTwo = Frame(root, bg='green')
-    frameTwo.pack(side=LEFT, expand=True, fill=BOTH)
-    setFrameTwo(frameTwo)
+    monitorParkingButton = Button(frameOne, text='Monitor Parking', font="Bold 20", command=lambda: showFootage())
 
-    frameThree = Frame(root, bg='yellow')
-    frameThree.pack(side=LEFT, expand=True, fill=BOTH)
-    setFrameThree(frameThree)
+    vehicleEntryButton = Button(frameOne, text='Scan Number Plate (Entry)', font="Bold 20",
+                                command=lambda: scanVehicleEntry())
 
+    vehicleExitButton = Button(frameOne, text='Scan Number Plate (Exit)', font="Bold 20",
+                               command=lambda: scanVehicleExit())
 
-def setFrameOne(frameOne):
-    image_cctv = PhotoImage(file='cctv.png')
-    image_cctv_label = Label(frameOne, image=image_cctv)
-    image_cctv_label.pack(pady=20)
-    openCameraButton = Button(frameOne, text='Monitor Parking', command=lambda: showFootage())
-    openCameraButton.pack()
+    checkLogsButton = Button(frameOne, text='Check Logs', font="Bold 20", command=lambda: checkLogs(root))
 
+    monitorParkingButton.grid(row=0, column=1, pady=30, sticky=NSEW, columnspan=2)
+    vehicleEntryButton.grid(row=1, column=1, pady=30)
+    vehicleExitButton.grid(row=2, column=1, pady=30)
+    checkLogsButton.grid(row=3, column=1, pady=30)
 
-def setFrameTwo(frameTwo):
-    image_cctv = PhotoImage(file='cctv.png')
-    image_cctv_label = Label(frameTwo, image=image_cctv)
-    image_cctv_label.pack(pady=20)
-    openCameraButton = Button(frameTwo, text='Vehicle Entry', command=lambda: scanVehicleEntry())
-    openCameraButton.pack()
+    frameOne.pack(side=TOP, fill=BOTH, expand=True, padx=600)
 
 
-def setFrameThree(frameThree):
-    image_cctv = PhotoImage(file='cctv.png')
-    image_cctv_label = Label(frameThree, image=image_cctv)
-    image_cctv_label.pack(pady=20)
-    openCameraButton = Button(frameThree, text='Vehicle Exit', command=lambda: scanVehicleExit())
-    openCameraButton.pack()
+def checkLogs(root):
+    database = Video.database
+    logReference = database.child("Others").child("Logs").get()
+    content = ""
+    for log in logReference.each():
+        print(log.key())
+        properties = log.val()
+        vNum = log.key()
+        content += ("Date :  %s \n" % properties.get("date"))
+        content += ("Vehicle Number :  %s \n" % vNum)
+        content += ("Entry Time :  %s \n" % properties.get("entryTime"))
+        content += ("Exit Time :  %s \n" % properties.get("exitTime"))
+        content += ("\n")
+    newWindow = Toplevel(root)
+    newWindow.title("Logs")
+    newWindow.geometry("600x600")
+
+    Label(newWindow, text=content, font=15).pack()
 
 
 def scanVehicleEntry():
@@ -59,7 +64,8 @@ def scanVehicleEntry():
 
 
 def scanVehicleExit():
-    vehicleNumber = "BAA2043"
+    Main.startNPR()
+    vehicleNumber = Main.numberPlateInString
     checkVehicleNumberExit(vehicleNumber)
 
 
@@ -141,7 +147,7 @@ def checkVehicleNumberExit(myVehicleNumber):
         database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("exitTime").set(current_time)
         database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("parkedDuration").set(
             str(total_Duration))
-
+    # vehicle_not_booked
     else:
         entry_time = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
             "entryTime").get().val()

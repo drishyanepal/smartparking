@@ -27,7 +27,7 @@ def startNPR():
         return  # and exit program
     # end if
 
-    imgOriginalScene = cv2.imread("plateimages/17.png")  # open image
+    imgOriginalScene = cv2.imread("plateimages/18.png")  # open image
 
     if imgOriginalScene is None:  # if image was not read successfully
         print("\nerror: image not read from file \n\n")  # print error message to std out
@@ -39,7 +39,6 @@ def startNPR():
 
     listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)  # detect chars in plates
 
-    cv2.imshow("imgOriginalScene", imgOriginalScene)  # show scene image
 
     if len(listOfPossiblePlates) == 0:  # if no plates were found
         print("\nno license plates were detected\n")  # inform user no plates were found
@@ -67,9 +66,9 @@ def startNPR():
         print("----------------------------------------")
 
         writeLicensePlateCharsOnImage(imgOriginalScene, licPlate)  # write license plate text on the image
-
-        cv2.imshow("imgOriginalScene", imgOriginalScene)  # re-show scene image
-
+        cv2.namedWindow("output", cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
+        cv2.resizeWindow("output", 900, 1500)
+        cv2.imshow("output", imgOriginalScene)  # re-show scene image
         cv2.imwrite("imgOriginalScene.png", imgOriginalScene)  # write image out to file
 
     # end if else
