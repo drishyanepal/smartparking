@@ -3,6 +3,7 @@ from tkinter import *
 import Video
 from Video import *
 from datetime import datetime
+from datetime import date
 import time
 import Main
 import FCMManager as fcm
@@ -60,7 +61,7 @@ def scanVehicleEntry():
     Main.startNPR()
     vehicleNumber = Main.numberPlateInString
     print(vehicleNumber)
-    # checkVehicleNumberEntry(vehicleNumber)
+    checkVehicleNumberEntry(vehicleNumber)
 
 
 def scanVehicleExit():
@@ -74,6 +75,7 @@ def checkVehicleNumberEntry(myVehicleNumber):
     vehicleBooked = False
     vehicleSlotNumber = 0
     slotByVehicle = database.child("SlotsByVehicle").get()
+    # check slot booked or not for that vehicle
     try:
         for row in slotByVehicle.each():
             if row.val() == myVehicleNumber:
@@ -103,66 +105,52 @@ def checkVehicleNumberEntry(myVehicleNumber):
             title = "Slot %s Allocated" % emptySlotInNumber
             body = "Dear user, Slot %s is allocated for you. Please proceed there." % emptySlotInNumber
             fcm.sendPush(title, body, tokens)
+            current_time = time.strftime("%H:%M:%S")
+            database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
+                "entryTime").set(current_time)
         except:
             pass
 
 
 def checkVehicleNumberExit(myVehicleNumber):
-    vehicleBooked = False
-    slotByVehicle = database.child("SlotsByVehicle").get()
+    bookedDuration = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
+        "bookedDuration").get().val()
+    get_time = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
+        "entryTime").get().val()
+    current_time = time.strftime("%H:%M:%S")
+    # if "pm" in get_time:
+    #     x = get_time.split("pm")
+    # else:
+    #     x = get_time.split("am")
+    # entry_time = x[0]
+    entry_time = get_time
+    time_format_str = '%H:%M:%S'
+    time1 = datetime.strptime(entry_time, time_format_str)
+    time2 = datetime.strptime(current_time, time_format_str)
+    diff = time2 - time1
+    diff_in_hours = diff.total_seconds() / 3600
+    total_Duration = round(diff_in_hours, 2)
     try:
-        for row in slotByVehicle.each():
-            if row.val() == myVehicleNumber:
-                vehicleBooked = True
-                break
-            else:
-                vehicleBooked = False
-    except:
-        pass
-    if vehicleBooked:
-        # check if parking time exceed
-        bookedDuration = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
-            "bookedDuration").get().val()
-        get_time = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
-            "entryTime").get().val()
-        current_time = time.strftime("%H:%M:%S")
-        # if "pm" in get_time:
-        #     x = get_time.split("pm")
-        # else:
-        #     x = get_time.split("am")
-        # entry_time = x[0]
-        entry_time = get_time
-        time_format_str = '%H:%M:%S'
-        time1 = datetime.strptime(entry_time, time_format_str)
-        time2 = datetime.strptime(current_time, time_format_str)
-        diff = time2 - time1
-        diff_in_hours = diff.total_seconds() / 3600
-        total_Duration = round(diff_in_hours, 2)
         x = total_Duration - int(bookedDuration)
-        if x > 0:
-            amount = int(x * 50)
-        else:
-            amount = 0
+    except:
+        x = total_Duration
+    if x > 0:
+        amount = int(x * 50)
         database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("cost").set(str(amount))
-        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("exitTime").set(current_time)
+        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("exitTime").set(
+            current_time)
         database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("parkedDuration").set(
             str(total_Duration))
-    # vehicle_not_booked
     else:
-        entry_time = database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child(
-            "entryTime").get().val()
-        current_time = time.strftime("%H:%M:%S")
-        time_format_str = '%H:%M:%S'
-        time1 = datetime.strptime(entry_time, time_format_str)
-        time2 = datetime.strptime(current_time, time_format_str)
-        diff = time2 - time1
-        diff_in_hours = diff.total_seconds() / 3600
-        total_Duration = round(diff_in_hours, 2)
-        amount = total_Duration * 50
-        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("cost").set(amount)
-        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("exitTime").set(current_time)
-        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).child("parkedDuration").set(
-            total_Duration)
+        amount = 0
+        today = date.today()
+        database.child("Others").child("Logs").child(myVehicleNumber).child("date").set(str(today))
+        database.child("Others").child("Logs").child(myVehicleNumber).child("cost").set(str(amount))
+        database.child("Others").child("Logs").child(myVehicleNumber).child("entryTime").set(entry_time)
+        database.child("Others").child("Logs").child(myVehicleNumber).child("exitTime").set(current_time)
+        database.child("Others").child("Logs").child(myVehicleNumber).child("parkedDuration").set(
+        str(total_Duration))
+        database.child("BookDetails").child("TimeDetails").child(myVehicleNumber).remove()
 
 
 def findEmptySlot(my_vehicle_number):

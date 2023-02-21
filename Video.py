@@ -160,4 +160,4 @@ if __name__ == "__main__":
         # cv2.imshow("ImageGray", imgGray)
         # cv2.imshow("ImageBlur", imgBlur)
         # cv2.imshow("ImageThresh", imgMedian)
-        cv2.waitKey(10)
+        cv2.waitKey(0)
